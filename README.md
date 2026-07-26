@@ -44,6 +44,6 @@ openxmlsdk-native/
 # 默认构建 (自动获取 NuGet 最新稳定版本)
 ./build_native.sh
 
-# 指定版本构建 (例如 3.6.0)
+# 指定具体版本构建 (例如 3.6.0 或 2.20.0)
 ./build_native.sh 3.6.0
 ```
