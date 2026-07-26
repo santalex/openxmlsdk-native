@@ -1,0 +1,10 @@
+version: 2
+updates:
+  # 自动监控 NuGet 包依赖更新 (如 DocumentFormat.OpenXml)
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
