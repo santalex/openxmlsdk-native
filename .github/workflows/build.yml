@@ -1,4 +1,4 @@
-name: Build Native AOT Artifacts (macOS, Windows, Linux, Android)
+name: Build Native AOT Artifacts (macOS, Windows, Linux)
 
 on:
   push:
