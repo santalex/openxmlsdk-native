@@ -1,0 +1,93 @@
+name: Build Native AOT Artifacts (macOS, Windows, Linux)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    name: Build macOS (x64 & ARM64)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build macOS Artifacts
+        run: |
+          dotnet publish -c Release -r osx-x64 -p:NativeLib=Shared -o dist/osx-x64/shared
+          dotnet publish -c Release -r osx-x64 -p:NativeLib=Static -o dist/osx-x64/static
+          dotnet publish -c Release -r osx-arm64 -p:NativeLib=Shared -o dist/osx-arm64/shared
+          dotnet publish -c Release -r osx-arm64 -p:NativeLib=Static -o dist/osx-arm64/static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-native-libs
+          path: dist/
+
+  build-windows:
+    name: Build Windows (x64 & ARM64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build Windows Artifacts
+        run: |
+          dotnet publish -c Release -r win-x64 -p:NativeLib=Shared -o dist/win-x64/shared
+          dotnet publish -c Release -r win-x64 -p:NativeLib=Static -o dist/win-x64/static
+          dotnet publish -c Release -r win-arm64 -p:NativeLib=Shared -o dist/win-arm64/shared
+          dotnet publish -c Release -r win-arm64 -p:NativeLib=Static -o dist/win-arm64/static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-native-libs
+          path: dist/
+
+  build-linux:
+    name: Build Linux (x64 & ARM64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install Linux Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+      - name: Build Linux Artifacts
+        run: |
+          dotnet publish -c Release -r linux-x64 -p:NativeLib=Shared -o dist/linux-x64/shared
+          dotnet publish -c Release -r linux-x64 -p:NativeLib=Static -o dist/linux-x64/static
+          dotnet publish -c Release -r linux-arm64 -p:NativeLib=Shared -o dist/linux-arm64/shared
+          dotnet publish -c Release -r linux-arm64 -p:NativeLib=Static -o dist/linux-arm64/static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-native-libs
+          path: dist/
+
+  release:
+    name: Create GitHub Release
+    needs: [build-macos, build-windows, build-linux]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: all-dist/
+      - name: Package Release Zip Artifacts
+        run: |
+          mkdir -p release-archives
+          cd all-dist
+          zip -r ../release-archives/openxmlsdk-native-macos.zip macos-native-libs/
+          zip -r ../release-archives/openxmlsdk-native-windows.zip windows-native-libs/
+          zip -r ../release-archives/openxmlsdk-native-linux.zip linux-native-libs/
+      - name: Publish Release to GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-archives/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
