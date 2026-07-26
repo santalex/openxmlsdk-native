@@ -25,8 +25,8 @@ elif [[ "$HOST_OS" == *"MINGW"* ]] || [[ "$HOST_OS" == *"CYGWIN"* ]] || [[ "$HOS
     TARGET_RIDS=("win-x64" "win-arm64")
     echo "🪟 宿主环境: Windows"
 else
-    TARGET_RIDS=("linux-x64" "linux-arm64")
-    echo "🐧 宿主环境: Linux"
+    TARGET_RIDS=("linux-x64" "linux-arm64" "android-arm64")
+    echo "🐧 宿主环境: Linux | 支持 Targets: ${TARGET_RIDS[*]}"
 fi
 
 for RID in "${TARGET_RIDS[@]}"; do
