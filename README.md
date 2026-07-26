@@ -14,6 +14,20 @@
   - **Android**：`android-arm64` (`.so` 动态库)
 - **标准 C 头文件**：提供 `include/OpenXmlSdkNative.h` 供 C/C++/Swift 等项目直接引用。若在 C# 中扩展了新的导出函数，开发者可根据需要自行调整该头文件声明。
 
+## 环境与依赖要求
+
+进行本地 Native AOT 编译前，需安装 **.NET 10 SDK** 以及对应目标平台的 C/C++ 编译工具链：
+
+- **macOS / iOS**：
+  - Xcode Command Line Tools (`xcode-select --install`)
+  - iOS 编译支持（可选）：`dotnet workload install ios`
+- **Linux / Android**：
+  - C 编译器及开发库：`clang` 或 `gcc`、`zlib1g-dev`
+  - Linux ARM64 交叉编译：`gcc-aarch64-linux-gnu`
+  - Android 编译支持（可选）：`dotnet workload install android`
+- **Windows**：
+  - Visual Studio 或 Build Tools for Visual Studio，需包含 "使用 C++ 的桌面开发" 工作负载
+
 ## 目录结构
 
 ```text
