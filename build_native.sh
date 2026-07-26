@@ -12,9 +12,8 @@ if [ -z "$TARGET_VER" ]; then
 fi
 
 echo "========================================================="
-echo "🚀 开始本地 Native AOT 构建"
+echo "--> Starting local Native AOT build..."
 echo "Target Package: DocumentFormat.OpenXml [ $TARGET_VER ]"
-echo "（注: 本项目主要依赖 GitHub Actions 云端流水线构建，本地脚本仅供调试参考）"
 echo "========================================================="
 
 HOST_OS="$(uname -s)"
@@ -46,7 +45,7 @@ for RID in "${TARGET_RIDS[@]}"; do
     echo "  [1/2] Compiling shared library -> $OUT_SHARED"
     dotnet publish -c Release -r "$RID" --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion="$TARGET_VER" "${EXTRA_FLAGS[@]}" -o "$OUT_SHARED" --nologo
 
-    # 2. 编译物理解态库 (.a / .lib)
+    # 2. 编译静态库 (.a / .lib)
     OUT_STATIC="$SCRIPT_DIR/dist/$RID/static"
     echo "  [2/2] Compiling static library -> $OUT_STATIC"
     dotnet publish -c Release -r "$RID" --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion="$TARGET_VER" "${EXTRA_FLAGS[@]}" -o "$OUT_STATIC" --nologo
