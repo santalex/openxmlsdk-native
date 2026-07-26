@@ -12,7 +12,7 @@
   - **Windows**：`win-x64` / `win-arm64` (`.dll` 动态库 & `.lib` 静态库)
   - **Linux**：`linux-x64` / `linux-arm64` (`.so` 动态库 & `.a` 静态库)
   - **Android**：`android-arm64` (`.so` 动态库)
-- **标准 C 头文件**：提供 `include/OpenXmlSdkNative.h` 供 C/C++/Swift 项目直接引用。
+- **标准 C 头文件**：提供 `include/OpenXmlSdkNative.h` 供 C/C++/Swift 等项目直接引用。若在 C# 中扩展了新的导出函数，开发者可根据需要自行调整该头文件声明。
 
 ## 目录结构
 
