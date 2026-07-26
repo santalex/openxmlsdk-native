@@ -1,4 +1,4 @@
-name: Build Native AOT Artifacts (macOS, Windows, Linux)
+name: Build Native AOT Artifacts (macOS, Windows, Linux, Android)
 
 on:
   push:
@@ -79,8 +79,8 @@ jobs:
           name: windows-native-libs
           path: dist/
 
-  build-linux:
-    name: Build Linux Native Artifacts (x64 & ARM64)
+  build-linux-android:
+    name: Build Linux & Android Native Artifacts (x64 & ARM64)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -98,24 +98,29 @@ jobs:
             LATEST_VER=$(curl -s https://api.nuget.org/v3-flatcontainer/documentformat.openxml/index.json | jq -r '.versions[-1]')
             echo "VER=${LATEST_VER:-3.5.1}" >> $GITHUB_ENV
           fi
-      - name: Install Linux Build Dependencies
+      - name: Install Linux Build Dependencies & Android Workload
         run: |
           sudo apt-get update
           sudo apt-get install -y clang zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          dotnet workload install android
       - name: Build Native Artifacts
         run: |
+          # 1. Linux x64 & ARM64
           dotnet publish -c Release -r linux-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/shared
           dotnet publish -c Release -r linux-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/static
           dotnet publish -c Release -r linux-arm64 --self-contained true -p:NativeLib=Shared -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/shared
           dotnet publish -c Release -r linux-arm64 --self-contained true -p:NativeLib=Static -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/static
+
+          # 2. Android ARM64 (.so 物理动态库)
+          dotnet publish -c Release -r android-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/android-arm64/shared
       - uses: actions/upload-artifact@v4
         with:
-          name: linux-native-libs
+          name: linux-android-native-libs
           path: dist/
 
   release:
     name: Create GitHub Release
-    needs: [build-macos, build-windows, build-linux]
+    needs: [build-macos, build-windows, build-linux-android]
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
@@ -131,7 +136,7 @@ jobs:
           cd all-dist
           zip -r ../release-archives/openxmlsdk-native-macos.zip macos-native-libs/
           zip -r ../release-archives/openxmlsdk-native-windows.zip windows-native-libs/
-          zip -r ../release-archives/openxmlsdk-native-linux.zip linux-native-libs/
+          zip -r ../release-archives/openxmlsdk-native-linux-android.zip linux-android-native-libs/
       - name: Publish Release to GitHub
         uses: softprops/action-gh-release@v2
         with:
