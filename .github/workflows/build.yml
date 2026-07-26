@@ -1,4 +1,4 @@
-name: Build Native AOT Artifacts (macOS, iOS, Windows, Linux)
+name: Build Native AOT Artifacts (macOS, Windows, Linux)
 
 on:
   push:
@@ -17,8 +17,8 @@ env:
   ACTIONS_RUNNER_FORCE_NODE24: 'true'
 
 jobs:
-  build-macos-ios:
-    name: Build macOS & iOS Native Artifacts (x64 & ARM64)
+  build-macos:
+    name: Build macOS Native Artifacts (x64 & ARM64)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,22 +37,15 @@ jobs:
             LATEST_VER=$(curl -s https://api.nuget.org/v3-flatcontainer/documentformat.openxml/index.json | jq -r '.versions[-1]')
             echo "VER=${LATEST_VER:-3.5.1}" >> $GITHUB_ENV
           fi
-      - name: Install iOS Workload
-        run: dotnet workload install ios
-      - name: Build macOS & iOS Native Artifacts
+      - name: Build Native Artifacts
         run: |
-          # 1. macOS (x64 & ARM64)
-          dotnet publish -c Release -r osx-x64 -p:TargetFramework=net10.0 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/shared
-          dotnet publish -c Release -r osx-x64 -p:TargetFramework=net10.0 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/static
-          dotnet publish -c Release -r osx-arm64 -p:TargetFramework=net10.0 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/shared
-          dotnet publish -c Release -r osx-arm64 -p:TargetFramework=net10.0 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/static
-
-          # 2. iOS (Device & Simulator Static Libraries .a)
-          dotnet publish -c Release -r ios-arm64 -p:TargetFramework=net10.0-ios --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/ios-arm64/static
-          dotnet publish -c Release -r iossimulator-arm64 -p:TargetFramework=net10.0-ios --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/iossimulator-arm64/static
+          dotnet publish -c Release -r osx-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/shared
+          dotnet publish -c Release -r osx-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/static
+          dotnet publish -c Release -r osx-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/shared
+          dotnet publish -c Release -r osx-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/static
       - uses: actions/upload-artifact@v4
         with:
-          name: macos-ios-native-libs
+          name: macos-native-libs
           path: dist/
 
   build-windows:
@@ -77,10 +70,10 @@ jobs:
           fi
       - name: Build Native Artifacts
         run: |
-          dotnet publish -f net10.0 -c Release -r win-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/shared
-          dotnet publish -f net10.0 -c Release -r win-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/static
-          dotnet publish -f net10.0 -c Release -r win-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-arm64/shared
-          dotnet publish -f net10.0 -c Release -r win-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-arm64/static
+          dotnet publish -c Release -r win-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/shared
+          dotnet publish -c Release -r win-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/static
+          dotnet publish -c Release -r win-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-arm64/shared
+          dotnet publish -c Release -r win-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: windows-native-libs
@@ -111,10 +104,10 @@ jobs:
           sudo apt-get install -y clang zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Build Native Artifacts
         run: |
-          dotnet publish -f net10.0 -c Release -r linux-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/shared
-          dotnet publish -f net10.0 -c Release -r linux-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/static
-          dotnet publish -f net10.0 -c Release -r linux-arm64 --self-contained true -p:NativeLib=Shared -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/shared
-          dotnet publish -f net10.0 -c Release -r linux-arm64 --self-contained true -p:NativeLib=Static -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/static
+          dotnet publish -c Release -r linux-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/shared
+          dotnet publish -c Release -r linux-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/static
+          dotnet publish -c Release -r linux-arm64 --self-contained true -p:NativeLib=Shared -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/shared
+          dotnet publish -c Release -r linux-arm64 --self-contained true -p:NativeLib=Static -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: linux-native-libs
@@ -122,7 +115,7 @@ jobs:
 
   release:
     name: Create GitHub Release
-    needs: [build-macos-ios, build-windows, build-linux]
+    needs: [build-macos, build-windows, build-linux]
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
@@ -136,7 +129,7 @@ jobs:
         run: |
           mkdir -p release-archives
           cd all-dist
-          zip -r ../release-archives/openxmlsdk-native-macos-ios.zip macos-ios-native-libs/
+          zip -r ../release-archives/openxmlsdk-native-macos.zip macos-native-libs/
           zip -r ../release-archives/openxmlsdk-native-windows.zip windows-native-libs/
           zip -r ../release-archives/openxmlsdk-native-linux.zip linux-native-libs/
       - name: Publish Release to GitHub
