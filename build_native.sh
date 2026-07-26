@@ -16,18 +16,34 @@ echo "开始本地 Native AOT 构建"
 echo "Target Package: DocumentFormat.OpenXml [ $TARGET_VER ]"
 echo "========================================================="
 
+# 2. 自动检测系统当前已安装的 .NET Workload 扩展
+INSTALLED_WORKLOADS=$(dotnet workload list 2>/dev/null || true)
+
 HOST_OS="$(uname -s)"
+TARGET_RIDS=()
 
 if [ "$HOST_OS" = "Darwin" ]; then
-    TARGET_RIDS=("osx-x64" "osx-arm64" "ios-arm64" "iossimulator-arm64")
-    echo "Host OS: macOS | Active Targets: ${TARGET_RIDS[*]}"
+    TARGET_RIDS+=("osx-x64" "osx-arm64")
+    if echo "$INSTALLED_WORKLOADS" | grep -i "ios" >/dev/null 2>&1; then
+        TARGET_RIDS+=("ios-arm64" "iossimulator-arm64")
+        echo "Host OS: macOS | 已检测到 iOS Workload，启用 macOS + iOS 目标构建"
+    else
+        echo "Host OS: macOS | 未检测到 iOS Workload，自动跳过 iOS 目标构建 (可选安装: dotnet workload install ios)"
+    fi
 elif [[ "$HOST_OS" == *"MINGW"* ]] || [[ "$HOST_OS" == *"CYGWIN"* ]] || [[ "$HOST_OS" == *"MSYS"* ]]; then
-    TARGET_RIDS=("win-x64" "win-arm64")
-    echo "Host OS: Windows | Active Targets: ${TARGET_RIDS[*]}"
+    TARGET_RIDS+=("win-x64" "win-arm64")
+    echo "Host OS: Windows | 启用 Windows 目标构建"
 else
-    TARGET_RIDS=("linux-x64" "linux-arm64" "android-arm64")
-    echo "Host OS: Linux | Active Targets: ${TARGET_RIDS[*]}"
+    TARGET_RIDS+=("linux-x64" "linux-arm64")
+    if echo "$INSTALLED_WORKLOADS" | grep -i "android" >/dev/null 2>&1; then
+        TARGET_RIDS+=("android-arm64")
+        echo "Host OS: Linux | 已检测到 Android Workload，启用 Linux + Android 目标构建"
+    else
+        echo "Host OS: Linux | 未检测到 Android Workload，自动跳过 Android 目标构建 (可选安装: dotnet workload install android)"
+    fi
 fi
+
+echo "Active Targets: ${TARGET_RIDS[*]}"
 
 for RID in "${TARGET_RIDS[@]}"; do
     echo ""
