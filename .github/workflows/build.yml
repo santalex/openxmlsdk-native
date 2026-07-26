@@ -37,7 +37,7 @@ jobs:
             echo "VER=${LATEST_VER:-3.5.1}" >> $GITHUB_ENV
           fi
       - name: Install iOS Workload
-        run: dotnet workload install ios --nologo
+        run: dotnet workload install ios
       - name: Build macOS & iOS Native Artifacts
         run: |
           # 1. macOS (x64 & ARM64)
@@ -108,7 +108,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clang zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-          dotnet workload install android --nologo
+          dotnet workload install android
       - name: Build Linux & Android Artifacts
         run: |
           # 1. Linux x64 & ARM64
