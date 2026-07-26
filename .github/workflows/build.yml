@@ -17,7 +17,7 @@ env:
 
 jobs:
   build-macos-ios:
-    name: Build macOS & iOS Native Artifacts
+    name: Build macOS & iOS Native Artifacts (x64 & ARM64)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
           fi
       - name: Install iOS Workload
         run: dotnet workload install ios
-      - name: Build macOS & iOS Native Artifacts
+      - name: Build Native Artifacts
         run: |
           # 1. macOS (x64 & ARM64)
           dotnet publish -c Release -r osx-x64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/shared
@@ -55,7 +55,7 @@ jobs:
           path: dist/
 
   build-windows:
-    name: Build Windows (x64 & ARM64)
+    name: Build Windows Native Artifacts (x64 & ARM64)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
             LATEST_VER=$(curl -s https://api.nuget.org/v3-flatcontainer/documentformat.openxml/index.json | jq -r '.versions[-1]')
             echo "VER=${LATEST_VER:-3.5.1}" >> $GITHUB_ENV
           fi
-      - name: Build Windows Artifacts
+      - name: Build Native Artifacts
         run: |
           dotnet publish -c Release -r win-x64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/shared
           dotnet publish -c Release -r win-x64 -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/static
@@ -86,7 +86,7 @@ jobs:
           path: dist/
 
   build-linux-android:
-    name: Build Linux & Android (x64 & ARM64)
+    name: Build Linux & Android Native Artifacts (x64 & ARM64)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -109,7 +109,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
           dotnet workload install android
-      - name: Build Linux & Android Artifacts
+      - name: Build Native Artifacts
         run: |
           # 1. Linux x64 & ARM64
           dotnet publish -c Release -r linux-x64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/shared
