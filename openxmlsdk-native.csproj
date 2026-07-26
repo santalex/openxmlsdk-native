@@ -7,9 +7,12 @@
     <NativeLib>Shared</NativeLib>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>openxmlsdk_native</AssemblyName>
+
+    <!-- 默认版本号为 3.5.1，支持命令行通过 -p:OpenXmlPackageVersion=xxx 动态覆盖 -->
+    <OpenXmlPackageVersion Condition="'$(OpenXmlPackageVersion)' == ''">3.5.1</OpenXmlPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="$(OpenXmlPackageVersion)" />
   </ItemGroup>
 </Project>

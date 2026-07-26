@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      sdk_version:
+        description: '微软 DocumentFormat.OpenXml NuGet 包版本 (如: 3.5.1 或 3.6.0)'
+        required: true
+        default: '3.5.1'
 
 jobs:
   build-macos:
@@ -15,12 +20,22 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Determine SDK Version
+        id: get_ver
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VER=${{ github.event.inputs.sdk_version }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" =~ ^refs/tags/v(.*)$ ]]; then
+            echo "VER=${BASH_REMATCH[1]}" >> $GITHUB_ENV
+          else
+            echo "VER=3.5.1" >> $GITHUB_ENV
+          fi
       - name: Build macOS Artifacts
         run: |
-          dotnet publish -c Release -r osx-x64 -p:NativeLib=Shared -o dist/osx-x64/shared
-          dotnet publish -c Release -r osx-x64 -p:NativeLib=Static -o dist/osx-x64/static
-          dotnet publish -c Release -r osx-arm64 -p:NativeLib=Shared -o dist/osx-arm64/shared
-          dotnet publish -c Release -r osx-arm64 -p:NativeLib=Static -o dist/osx-arm64/static
+          dotnet publish -c Release -r osx-x64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/shared
+          dotnet publish -c Release -r osx-x64 -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/static
+          dotnet publish -c Release -r osx-arm64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/shared
+          dotnet publish -c Release -r osx-arm64 -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: macos-native-libs
@@ -34,12 +49,22 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Determine SDK Version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VER=${{ github.event.inputs.sdk_version }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" =~ ^refs/tags/v(.*)$ ]]; then
+            echo "VER=${BASH_REMATCH[1]}" >> $GITHUB_ENV
+          else
+            echo "VER=3.5.1" >> $GITHUB_ENV
+          fi
       - name: Build Windows Artifacts
         run: |
-          dotnet publish -c Release -r win-x64 -p:NativeLib=Shared -o dist/win-x64/shared
-          dotnet publish -c Release -r win-x64 -p:NativeLib=Static -o dist/win-x64/static
-          dotnet publish -c Release -r win-arm64 -p:NativeLib=Shared -o dist/win-arm64/shared
-          dotnet publish -c Release -r win-arm64 -p:NativeLib=Static -o dist/win-arm64/static
+          dotnet publish -c Release -r win-x64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/shared
+          dotnet publish -c Release -r win-x64 -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/static
+          dotnet publish -c Release -r win-arm64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-arm64/shared
+          dotnet publish -c Release -r win-arm64 -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: windows-native-libs
@@ -53,16 +78,25 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Determine SDK Version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VER=${{ github.event.inputs.sdk_version }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" =~ ^refs/tags/v(.*)$ ]]; then
+            echo "VER=${BASH_REMATCH[1]}" >> $GITHUB_ENV
+          else
+            echo "VER=3.5.1" >> $GITHUB_ENV
+          fi
       - name: Install Linux Build Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y clang zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Build Linux Artifacts
         run: |
-          dotnet publish -c Release -r linux-x64 -p:NativeLib=Shared -o dist/linux-x64/shared
-          dotnet publish -c Release -r linux-x64 -p:NativeLib=Static -o dist/linux-x64/static
-          dotnet publish -c Release -r linux-arm64 -p:NativeLib=Shared -o dist/linux-arm64/shared
-          dotnet publish -c Release -r linux-arm64 -p:NativeLib=Static -o dist/linux-arm64/static
+          dotnet publish -c Release -r linux-x64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/shared
+          dotnet publish -c Release -r linux-x64 -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/static
+          dotnet publish -c Release -r linux-arm64 -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/shared
+          dotnet publish -c Release -r linux-arm64 -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: linux-native-libs
@@ -71,7 +105,7 @@ jobs:
   release:
     name: Create GitHub Release
     needs: [build-macos, build-windows, build-linux]
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -89,5 +123,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: release-archives/*
+          tag_name: ${{ github.event.inputs.sdk_version && format('v{0}', github.event.inputs.sdk_version) || github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
