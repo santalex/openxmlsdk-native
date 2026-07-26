@@ -42,14 +42,14 @@ jobs:
       - name: Build macOS & iOS Native Artifacts
         run: |
           # 1. macOS (x64 & ARM64)
-          dotnet publish -f net10.0 -c Release -r osx-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/shared
-          dotnet publish -f net10.0 -c Release -r osx-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/static
-          dotnet publish -f net10.0 -c Release -r osx-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/shared
-          dotnet publish -f net10.0 -c Release -r osx-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/static
+          dotnet publish -c Release -r osx-x64 -p:TargetFramework=net10.0 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/shared
+          dotnet publish -c Release -r osx-x64 -p:TargetFramework=net10.0 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/static
+          dotnet publish -c Release -r osx-arm64 -p:TargetFramework=net10.0 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/shared
+          dotnet publish -c Release -r osx-arm64 -p:TargetFramework=net10.0 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/static
 
           # 2. iOS (Device & Simulator Static Libraries .a)
-          dotnet publish -f net10.0-ios -c Release -r ios-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/ios-arm64/static
-          dotnet publish -f net10.0-ios -c Release -r iossimulator-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/iossimulator-arm64/static
+          dotnet publish -c Release -r ios-arm64 -p:TargetFramework=net10.0-ios --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/ios-arm64/static
+          dotnet publish -c Release -r iossimulator-arm64 -p:TargetFramework=net10.0-ios --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/iossimulator-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: macos-ios-native-libs
