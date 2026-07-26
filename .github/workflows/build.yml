@@ -11,6 +11,10 @@ on:
         required: true
         default: '3.5.1'
 
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: 'true'
+
 jobs:
   build-macos:
     name: Build macOS (x64 & ARM64)
