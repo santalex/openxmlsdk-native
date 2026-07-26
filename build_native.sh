@@ -12,8 +12,9 @@ if [ -z "$TARGET_VER" ]; then
 fi
 
 echo "========================================================="
-echo "开始本地 Native AOT 构建"
+echo "🚀 开始本地 Native AOT 构建"
 echo "Target Package: DocumentFormat.OpenXml [ $TARGET_VER ]"
+echo "（注: 本项目主要依赖 GitHub Actions 云端流水线构建，本地脚本仅供调试参考）"
 echo "========================================================="
 
 # 2. 自动检测系统当前已安装的 .NET Workload 扩展

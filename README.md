@@ -44,6 +44,8 @@ openxmlsdk-native/
 
 ## 本地构建说明
 
+> **注**：项目主要依赖 GitHub Actions 进行多平台自动化云端构建与发布，本地 `./build_native.sh` 脚本仅供本地调试参考，未在所有物理系统上进行完整测试。推荐优先通过 GitHub Actions 触发构建。
+
 运行 `./build_native.sh` 即可开始本地构建：
 
 ```bash
