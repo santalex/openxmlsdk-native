@@ -15,6 +15,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: '1'
   DOTNET_NOLOGO: 'true'
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  VER: '3.5.1'
 
 jobs:
   build-macos:
@@ -39,10 +40,10 @@ jobs:
           fi
       - name: Build Native Artifacts
         run: |
-          dotnet publish -c Release -r osx-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/shared
-          dotnet publish -c Release -r osx-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-x64/static
-          dotnet publish -c Release -r osx-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/shared
-          dotnet publish -c Release -r osx-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/osx-arm64/static
+          dotnet publish -c Release -r osx-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=$VER -o dist/osx-x64/shared
+          dotnet publish -c Release -r osx-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=$VER -o dist/osx-x64/static
+          dotnet publish -c Release -r osx-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=$VER -o dist/osx-arm64/shared
+          dotnet publish -c Release -r osx-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=$VER -o dist/osx-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: macos-native-libs
@@ -69,11 +70,12 @@ jobs:
             echo "VER=${LATEST_VER:-3.5.1}" >> $GITHUB_ENV
           fi
       - name: Build Native Artifacts
+        shell: bash
         run: |
-          dotnet publish -c Release -r win-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/shared
-          dotnet publish -c Release -r win-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-x64/static
-          dotnet publish -c Release -r win-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-arm64/shared
-          dotnet publish -c Release -r win-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/win-arm64/static
+          dotnet publish -c Release -r win-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=$VER -o dist/win-x64/shared
+          dotnet publish -c Release -r win-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=$VER -o dist/win-x64/static
+          dotnet publish -c Release -r win-arm64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=$VER -o dist/win-arm64/shared
+          dotnet publish -c Release -r win-arm64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=$VER -o dist/win-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: windows-native-libs
@@ -104,10 +106,10 @@ jobs:
           sudo apt-get install -y clang zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Build Native Artifacts
         run: |
-          dotnet publish -c Release -r linux-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/shared
-          dotnet publish -c Release -r linux-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-x64/static
-          dotnet publish -c Release -r linux-arm64 --self-contained true -p:NativeLib=Shared -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/shared
-          dotnet publish -c Release -r linux-arm64 --self-contained true -p:NativeLib=Static -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=${{ env.VER }} -o dist/linux-arm64/static
+          dotnet publish -c Release -r linux-x64 --self-contained true -p:NativeLib=Shared -p:OpenXmlPackageVersion=$VER -o dist/linux-x64/shared
+          dotnet publish -c Release -r linux-x64 --self-contained true -p:NativeLib=Static -p:OpenXmlPackageVersion=$VER -o dist/linux-x64/static
+          dotnet publish -c Release -r linux-arm64 --self-contained true -p:NativeLib=Shared -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=$VER -o dist/linux-arm64/shared
+          dotnet publish -c Release -r linux-arm64 --self-contained true -p:NativeLib=Static -p:ObjCopyName=aarch64-linux-gnu-objcopy -p:OpenXmlPackageVersion=$VER -o dist/linux-arm64/static
       - uses: actions/upload-artifact@v4
         with:
           name: linux-native-libs
